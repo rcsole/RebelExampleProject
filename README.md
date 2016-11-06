@@ -24,7 +24,7 @@ install --unsafe-perm` instead.
 
 ## Included Top Level
 
-The top level `rtop` is built in to the sandbox: 
+The top level `rtop` is built in to the sandbox:
 
 ```sh
 # Opens `rtop` from the sandbox.
@@ -34,7 +34,7 @@ npm run top
 ## Editor Support
 
 All of the IDE support, including error highlighting, autocomplete, and
-syntax is included inside of the sandbox. 
+syntax is included inside of the sandbox.
 
 ```sh
 # Opens your `$EDITOR` with all the right tools in your `$PATH`
@@ -91,6 +91,47 @@ To make your editor load the IDE support from the sandbox:
   packages can publish environment variables in the [dependency-env
   repo](https://github.com/npm-ml/dependency-env).
 
+#### Adding OCaml libraries
+In case you were wondering how to make libraries like `Core` available to your
+project, you can do that via `npm`. The user https://www.npmjs.com/~opam-alpha,
+is used to publish some of the popular OCaml libraries on `npm` so you can
+easily install them. Here's an example that would install the aforementioned
+`Core` library Jane Street:
+
+```sh
+npm i @opam-alpha/core -S # this will install and save to package.json
+```
+
+And then in your `package.json` add an entry to `rebel`:
+
+```json
+"ocamlfindDependencies": [
+  "core"
+]
+```
+
+You might run into this error after adding the previous lines:
+
+```
+ocamlfind: Error from package `threads': Missing -thread or -vmthread switch
+```
+
+Just add another entry to `rebel`:
+
+```json
+"targets": [
+  {
+    "target": "default",
+    "engine": "native",
+    "entry": "src/Index.re",
+    "unstable_flags": {
+      "link": "-thread",
+      "compile": "-thread"
+    }
+  }
+]
+```
+
 ### Recompiling
 - To recompile this package (but not your dependencies), remove the local build
   artifacts for this package (usually just the `_build` directory) and then run
@@ -118,4 +159,3 @@ npm run whereisreason
 - This also installs sandboxed IDE support for Vim/Atom/Emacs. We need to
   upgrade all of the plugins to automatically search for IDE plugins inside of
   the `./node_modules` directory.
-
